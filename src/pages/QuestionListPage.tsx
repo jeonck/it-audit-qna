@@ -1,29 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
-const questions = [
-  {
-    id: 1,
-    title: '정보시스템 감리 Q&A 사이트입니다.',
-    author: '관리자',
-    createdAt: '2023-10-27',
-    answers: 2,
-  },
-  {
-    id: 2,
-    title: '두번째 질문입니다.',
-    author: '사용자',
-    createdAt: '2023-10-26',
-    answers: 1,
-  },
-];
+interface Question {
+  id: string;
+  title: string;
+  author: string;
+  created_at: string;
+  answers_count: number; // Assuming you'll add a count of answers
+}
 
 const QuestionListPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('id, title, author, created_at, answers(id)') // Select answers to count them
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      // Map the data to include answers_count
+      const formattedQuestions: Question[] = data.map((q: any) => ({
+        id: q.id,
+        title: q.title,
+        author: q.author,
+        created_at: new Date(q.created_at).toLocaleDateString(),
+        answers_count: q.answers ? q.answers.length : 0,
+      }));
+
+      setQuestions(formattedQuestions);
+      setLoading(false);
+    };
+
+    fetchQuestions();
+  }, []);
 
   const filteredQuestions = questions.filter((question) =>
     question.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>오류: {error}</div>;
+  }
 
   return (
     <div>
@@ -50,9 +82,9 @@ const QuestionListPage: React.FC = () => {
             <div className="text-sm text-gray-600 mt-1">
               <span>작성자: {question.author}</span>
               <span className="mx-2">|</span>
-              <span>작성일: {question.createdAt}</span>
+              <span>작성일: {question.created_at}</span>
               <span className="mx-2">|</span>
-              <span>답변: {question.answers}</span>
+              <span>답변: {question.answers_count}</span>
             </div>
           </li>
         ))}

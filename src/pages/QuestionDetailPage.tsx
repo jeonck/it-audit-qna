@@ -1,29 +1,81 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
-const question = {
-  id: 1,
-  title: '정보시스템 감리 Q&A 사이트입니다.',
-  author: '관리자',
-  createdAt: '2023-10-27',
-  content: '이 사이트는 정보시스템 감리에 대한 질문과 답변을 공유하는 공간입니다. 자유롭게 질문하고 답변해주세요.',
-  answers: [
-    {
-      id: 1,
-      author: '사용자1',
-      createdAt: '2023-10-27',
-      content: '좋은 사이트네요. 자주 이용하겠습니다.',
-    },
-    {
-      id: 2,
-      author: '사용자2',
-      createdAt: '2023-10-28',
-      content: '감리 관련해서 궁금한 점이 있었는데, 여기서 질문하면 되겠네요.',
-    },
-  ],
-};
+interface Answer {
+  id: string;
+  author: string;
+  created_at: string;
+  content: string;
+}
+
+interface QuestionDetail {
+  id: string;
+  title: string;
+  author: string;
+  created_at: string;
+  content: string;
+  answers: Answer[];
+}
 
 const QuestionDetailPage: React.FC = () => {
-  // const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
+  const [question, setQuestion] = useState<QuestionDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchQuestion = async () => {
+      if (!id) {
+        setError('Question ID is missing.');
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*, answers(*)')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data) {
+        setQuestion({
+          id: data.id,
+          title: data.title,
+          author: data.author,
+          created_at: new Date(data.created_at).toLocaleDateString(),
+          content: data.content,
+          answers: data.answers.map((ans: any) => ({
+            id: ans.id,
+            author: ans.author,
+            created_at: new Date(ans.created_at).toLocaleDateString(),
+            content: ans.content,
+          })),
+        });
+      }
+      setLoading(false);
+    };
+
+    fetchQuestion();
+  }, [id]);
+
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>오류: {error}</div>;
+  }
+
+  if (!question) {
+    return <div>질문을 찾을 수 없습니다.</div>;
+  }
 
   return (
     <div>
@@ -32,7 +84,7 @@ const QuestionDetailPage: React.FC = () => {
         <div className="text-sm text-gray-600">
           <span>작성자: {question.author}</span>
           <span className="mx-2">|</span>
-          <span>작성일: {question.createdAt}</span>
+          <span>작성일: {question.created_at}</span>
         </div>
       </div>
       <div className="prose max-w-none mb-8">
@@ -46,7 +98,7 @@ const QuestionDetailPage: React.FC = () => {
               <div className="text-sm text-gray-600 mb-2">
                 <span>{answer.author}</span>
                 <span className="mx-2">|</span>
-                <span>{answer.createdAt}</span>
+                <span>{answer.created_at}</span>
               </div>
               <p>{answer.content}</p>
             </li>

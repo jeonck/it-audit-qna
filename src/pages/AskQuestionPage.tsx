@@ -1,16 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const AskQuestionPage: React.FC = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [author, setAuthor] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement question submission logic
-    console.log({ title, content });
-    navigate('/');
+    setLoading(true);
+    setError(null);
+
+    const { data, error } = await supabase
+      .from('questions')
+      .insert([{ title, content, author }])
+      .select();
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+    } else {
+      console.log('Question submitted:', data);
+      navigate('/');
+    }
   };
 
   return (
@@ -31,6 +48,19 @@ const AskQuestionPage: React.FC = () => {
           />
         </div>
         <div className="mb-4">
+          <label htmlFor="author" className="block text-lg font-semibold mb-2">
+            작성자
+          </label>
+          <input
+            type="text"
+            id="author"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md"
+            required
+          />
+        </div>
+        <div className="mb-4">
           <label htmlFor="content" className="block text-lg font-semibold mb-2">
             내용
           </label>
@@ -43,8 +73,9 @@ const AskQuestionPage: React.FC = () => {
             required
           />
         </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">
-          질문 등록
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md" disabled={loading}>
+          {loading ? '등록 중...' : '질문 등록'}
         </button>
       </form>
     </div>
