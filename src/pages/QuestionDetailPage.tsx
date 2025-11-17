@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 
 const question = {
   id: 1,
@@ -24,7 +23,7 @@ const question = {
 };
 
 const QuestionDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  // const { id } = useParams<{ id: string }>();
 
   return (
     <div>
