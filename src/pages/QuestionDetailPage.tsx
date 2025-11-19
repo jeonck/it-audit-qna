@@ -75,6 +75,8 @@ const QuestionDetailPage: React.FC = () => {
   const [editedAnswerContent, setEditedAnswerContent] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
+  const [isEditingTags, setIsEditingTags] = useState(false);
+  const [editedTags, setEditedTags] = useState('');
 
   const handleAnswerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,6 +186,39 @@ const QuestionDetailPage: React.FC = () => {
     setError(null);
   };
 
+  const handleEditTagsClick = () => {
+    if (question) {
+      setIsEditingTags(true);
+      setEditedTags(question.tags.join(', '));
+    }
+  };
+
+  const handleSaveTags = async () => {
+    if (!question) return;
+
+    const tagsArray = editedTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+    const { error } = await supabase
+      .from('questions')
+      .update({ tags: tagsArray })
+      .eq('id', question.id);
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setQuestion({ ...question, tags: tagsArray });
+      setIsEditingTags(false);
+      setEditedTags('');
+      setError(null);
+    }
+  };
+
+  const handleCancelTagsEdit = () => {
+    setIsEditingTags(false);
+    setEditedTags('');
+    setError(null);
+  };
+
   if (loading) {
     return <div>로딩 중...</div>;
   }
@@ -237,18 +272,54 @@ const QuestionDetailPage: React.FC = () => {
           <span className="mx-2">|</span>
           <span>작성일: {question.created_at}</span>
         </div>
-        {question.tags && question.tags.length > 0 && (
-          <div className="mt-4">
-            {question.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+        <div className="mt-4">
+          {isEditingTags ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={editedTags}
+                onChange={(e) => setEditedTags(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="태그 (쉼표로 구분)"
+              />
+              <button
+                onClick={handleSaveTags}
+                className="bg-green-500 text-white px-4 py-2 rounded-md flex-shrink-0"
               >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
+                저장
+              </button>
+              <button
+                onClick={handleCancelTagsEdit}
+                className="bg-gray-500 text-white px-4 py-2 rounded-md flex-shrink-0"
+              >
+                취소
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <div>
+                {question.tags && question.tags.length > 0 ? (
+                  question.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                    >
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-sm text-gray-500">태그 없음</span>
+                )}
+              </div>
+              <button
+                onClick={handleEditTagsClick}
+                className="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm"
+              >
+                수정
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <div
         className="prose max-w-none mb-8"
