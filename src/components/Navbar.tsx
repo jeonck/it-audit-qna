@@ -1,22 +1,32 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
+  const handleTitleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      window.location.reload();
+    } else {
+      navigate('/');
+    }
+  };
 
   return (
     <nav className="bg-white/80 backdrop-blur-md shadow-soft-lg sticky top-0 z-50 border-b border-gray-200">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-gray-900 hover:opacity-80 transition-opacity flex items-center gap-2">
+            <a href="/" onClick={handleTitleClick} className="text-2xl font-bold text-gray-900 hover:opacity-80 transition-opacity flex items-center gap-2">
               <span className="text-3xl">📋</span>
               <span>
                 <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">정보시스템 감리</span>
                 <span className="text-gray-700"> Q&A</span>
               </span>
-            </Link>
+            </a>
           </div>
 
           {/* Desktop Menu */}
