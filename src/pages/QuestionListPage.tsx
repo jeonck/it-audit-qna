@@ -70,8 +70,8 @@ const QuestionListPage: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">정보시스템 감리 Q&A</h1>
-        <Link to="/ask" className="bg-blue-500 text-white px-4 py-2 rounded-md">
+        <h1 className="text-3xl lg:text-4xl font-bold text-neutral-800">정보시스템 감리 Q&A</h1>
+        <Link to="/ask" className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
           질문하기
         </Link>
       </div>
@@ -79,18 +79,18 @@ const QuestionListPage: React.FC = () => {
         <input
           type="text"
           placeholder="질문 검색..."
-          className="w-full px-4 py-2 border rounded-md"
+          className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
       <div className="mb-6">
-        <span className="mr-2 font-semibold">태그:</span>
+        <span className="mr-2 font-semibold text-neutral-700">태그:</span>
         <button
           onClick={() => setSelectedTag(null)}
-          className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 ${
+          className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 transition-colors duration-200 ${
             !selectedTag
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700'
+              ? 'bg-primary-500 text-white hover:bg-primary-600'
+              : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
           }`}
         >
           전체
@@ -99,10 +99,10 @@ const QuestionListPage: React.FC = () => {
           <button
             key={tag}
             onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-            className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 ${
+            className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 transition-colors duration-200 ${
               tag === selectedTag
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 text-gray-700'
+                ? 'bg-primary-500 text-white hover:bg-primary-600'
+                : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
             }`}
           >
             {tag}
@@ -111,21 +111,21 @@ const QuestionListPage: React.FC = () => {
       </div>
       <ul>
         {filteredQuestions.map((question) => (
-          <li key={question.id} className="border-b py-4">
-            <Link to={`/question/${question.id}`} className="text-lg font-semibold text-blue-600 hover:underline">
+          <li key={question.id} className="card-elevated p-4 mb-4">
+            <Link to={`/question/${question.id}`} className="text-lg font-semibold text-primary-600 hover:underline">
               {question.title}
             </Link>
             <div className="mt-2">
               {question.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                  className="inline-block bg-neutral-200 rounded-full px-2 py-0.5 text-xs font-semibold text-neutral-700 mr-1"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-            <div className="text-sm text-gray-600 mt-1">
+            <div className="text-sm text-neutral-600 mt-1">
               <span>작성자: {question.author}</span>
               <span className="mx-2">|</span>
               <span>작성일: {question.created_at}</span>

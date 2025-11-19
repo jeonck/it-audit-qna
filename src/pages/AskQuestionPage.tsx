@@ -48,7 +48,7 @@ const AskQuestionPage: React.FC = () => {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md"
+            className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             required
           />
         </div>
@@ -61,7 +61,7 @@ const AskQuestionPage: React.FC = () => {
             id="author"
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md"
+            className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             required
           />
         </div>
@@ -74,7 +74,7 @@ const AskQuestionPage: React.FC = () => {
             id="tags"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md"
+            className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             placeholder="예: 보안, 규정준수, 데이터베이스"
           />
         </div>
@@ -86,11 +86,11 @@ const AskQuestionPage: React.FC = () => {
             theme="snow"
             value={content}
             onChange={setContent}
-            className="bg-white"
+            className="bg-white border border-neutral-300 rounded-lg"
           />
         </div>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md" disabled={loading}>
+        {error && <p className="text-accent-500 mb-4">{error}</p>}
+        <button type="submit" className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200" disabled={loading}>
           {loading ? '등록 중...' : '질문 등록'}
         </button>
       </form>

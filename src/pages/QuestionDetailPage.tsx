@@ -241,84 +241,82 @@ const QuestionDetailPage: React.FC = () => {
               type="text"
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
-              className="text-3xl font-bold w-full p-2 border border-gray-300 rounded-md"
+              className="text-3xl font-bold w-full p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
             <button
               onClick={handleSaveTitle}
-              className="bg-green-500 text-white px-4 py-2 rounded-md flex-shrink-0"
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-shrink-0 transition-colors duration-200"
             >
               저장
             </button>
             <button
               onClick={handleCancelTitleEdit}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md flex-shrink-0"
+              className="bg-neutral-500 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg flex-shrink-0 transition-colors duration-200"
             >
               취소
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-bold">{question.title}</h1>
-            <button
-              onClick={handleEditTitleClick}
-              className="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm"
-            >
-              수정
-            </button>
-          </div>
-        )}
-        <div className="text-sm text-gray-600 mt-2">
-          <span>작성자: {question.author}</span>
-          <span className="mx-2">|</span>
-          <span>작성일: {question.created_at}</span>
-        </div>
-        <div className="mt-4">
-          {isEditingTags ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={editedTags}
-                onChange={(e) => setEditedTags(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder="태그 (쉼표로 구분)"
-              />
+          <>
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-bold">{question.title}</h1>
               <button
-                onClick={handleSaveTags}
-                className="bg-green-500 text-white px-4 py-2 rounded-md flex-shrink-0"
+                onClick={handleEditTitleClick}
+                className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-lg text-sm transition-colors duration-200"
               >
-                저장
-              </button>
-              <button
-                onClick={handleCancelTagsEdit}
-                className="bg-gray-500 text-white px-4 py-2 rounded-md flex-shrink-0"
-              >
-                취소
+                수정
               </button>
             </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <div>
+            {isEditingTags ? (
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  type="text"
+                  value={editedTags}
+                  onChange={(e) => setEditedTags(e.target.value)}
+                  className="w-full p-1 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="태그 (쉼표로 구분)"
+                />
+                <button
+                  onClick={handleSaveTags}
+                  className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-lg text-xs flex-shrink-0 transition-colors duration-200"
+                >
+                  저장
+                </button>
+                <button
+                  onClick={handleCancelTagsEdit}
+                  className="bg-neutral-500 hover:bg-neutral-600 text-white px-2 py-1 rounded-lg text-xs flex-shrink-0 transition-colors duration-200"
+                >
+                  취소
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-2">
                 {question.tags && question.tags.length > 0 ? (
                   question.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                      className="inline-block bg-neutral-200 rounded-full px-2 py-0.5 text-xs font-semibold text-neutral-700 mr-1"
                     >
                       {tag}
                     </span>
                   ))
                 ) : (
-                  <span className="text-sm text-gray-500">태그 없음</span>
+                  <span className="text-xs text-neutral-500">태그 없음</span>
                 )}
+                <button
+                  onClick={handleEditTagsClick}
+                  className="bg-primary-500 hover:bg-primary-600 text-white px-2 py-0.5 rounded-lg text-xs transition-colors duration-200"
+                >
+                  수정
+                </button>
               </div>
-              <button
-                onClick={handleEditTagsClick}
-                className="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm"
-              >
-                수정
-              </button>
-            </div>
-          )}
+            )}
+          </>
+        )}
+        <div className="text-sm text-neutral-600 mt-2">
+          <span>작성자: {question.author}</span>
+          <span className="mx-2">|</span>
+          <span>작성일: {question.created_at}</span>
         </div>
       </div>
       <div
@@ -341,13 +339,13 @@ const QuestionDetailPage: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleSaveEdit(answer.id)}
-                        className="bg-green-500 text-white px-3 py-1 rounded-md text-xs mr-2"
+                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-xs mr-2 transition-colors duration-200"
                       >
                         저장
                       </button>
                       <button
                         onClick={handleCancelEdit}
-                        className="bg-gray-500 text-white px-3 py-1 rounded-md text-xs"
+                        className="bg-neutral-500 hover:bg-neutral-600 text-white px-3 py-1 rounded-lg text-xs transition-colors duration-200"
                       >
                         취소
                       </button>
@@ -356,14 +354,14 @@ const QuestionDetailPage: React.FC = () => {
                     <>
                       <button
                         onClick={() => handleEditClick(answer)}
-                        className="bg-yellow-500 text-white px-3 py-1 rounded-md text-xs mr-2"
+                        className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-lg text-xs mr-2 transition-colors duration-200"
                       >
                         수정
                       </button>
                       {/* Delete button will be implemented later */}
                       <button
                         // onClick={() => handleDeleteAnswer(answer.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded-md text-xs"
+                        className="bg-accent-500 hover:bg-accent-600 text-white px-3 py-1 rounded-lg text-xs transition-colors duration-200"
                       >
                         삭제
                       </button>
@@ -376,7 +374,7 @@ const QuestionDetailPage: React.FC = () => {
                   theme="snow"
                   value={editedAnswerContent}
                   onChange={setEditedAnswerContent}
-                  className="bg-white"
+                  className="bg-white border border-neutral-300 rounded-lg"
                 />
               ) : (
                 <div
@@ -398,24 +396,24 @@ const QuestionDetailPage: React.FC = () => {
               id="author"
               value={newAnswerAuthor}
               onChange={(e) => setNewAnswerAuthor(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              className="w-full p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               required
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="content" className="block text-sm font-medium text-neutral-700 mb-1">
               내용
             </label>
             <ReactQuill
               theme="snow"
               value={newAnswerContent}
               onChange={setNewAnswerContent}
-              className="bg-white"
+              className="bg-white border border-neutral-300 rounded-lg"
             />
           </div>
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 mt-4"
+            className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 mt-4"
           >
             답변 등록
           </button>
