@@ -73,6 +73,8 @@ const QuestionDetailPage: React.FC = () => {
   const [newAnswerContent, setNewAnswerContent] = useState('');
   const [editingAnswerId, setEditingAnswerId] = useState<string | null>(null);
   const [editedAnswerContent, setEditedAnswerContent] = useState('');
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState('');
 
   const handleAnswerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,6 +150,40 @@ const QuestionDetailPage: React.FC = () => {
     setError(null);
   };
 
+  const handleEditTitleClick = () => {
+    if (question) {
+      setIsEditingTitle(true);
+      setEditedTitle(question.title);
+    }
+  };
+
+  const handleSaveTitle = async () => {
+    if (!editedTitle.trim() || !question) {
+      setError('Title cannot be empty.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('questions')
+      .update({ title: editedTitle })
+      .eq('id', question.id);
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setQuestion({ ...question, title: editedTitle });
+      setIsEditingTitle(false);
+      setEditedTitle('');
+      setError(null);
+    }
+  };
+
+  const handleCancelTitleEdit = () => {
+    setIsEditingTitle(false);
+    setEditedTitle('');
+    setError(null);
+  };
+
   if (loading) {
     return <div>로딩 중...</div>;
   }
@@ -164,8 +200,39 @@ const QuestionDetailPage: React.FC = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{question.title}</h1>
-        <div className="text-sm text-gray-600">
+        {isEditingTitle ? (
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              className="text-3xl font-bold w-full p-2 border border-gray-300 rounded-md"
+            />
+            <button
+              onClick={handleSaveTitle}
+              className="bg-green-500 text-white px-4 py-2 rounded-md flex-shrink-0"
+            >
+              저장
+            </button>
+            <button
+              onClick={handleCancelTitleEdit}
+              className="bg-gray-500 text-white px-4 py-2 rounded-md flex-shrink-0"
+            >
+              취소
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold">{question.title}</h1>
+            <button
+              onClick={handleEditTitleClick}
+              className="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm"
+            >
+              수정
+            </button>
+          </div>
+        )}
+        <div className="text-sm text-gray-600 mt-2">
           <span>작성자: {question.author}</span>
           <span className="mx-2">|</span>
           <span>작성일: {question.created_at}</span>
