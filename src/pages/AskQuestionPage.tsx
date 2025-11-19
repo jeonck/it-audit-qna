@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { supabase } from '../supabaseClient';
 
 const AskQuestionPage: React.FC = () => {
@@ -7,6 +9,7 @@ const AskQuestionPage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [author, setAuthor] = useState('');
+  const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,9 +18,11 @@ const AskQuestionPage: React.FC = () => {
     setLoading(true);
     setError(null);
 
+    const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+
     const { data, error } = await supabase
       .from('questions')
-      .insert([{ title, content, author }])
+      .insert([{ title, content, author, tags: tagsArray }])
       .select();
 
     setLoading(false);
@@ -61,16 +66,27 @@ const AskQuestionPage: React.FC = () => {
           />
         </div>
         <div className="mb-4">
+          <label htmlFor="tags" className="block text-lg font-semibold mb-2">
+            태그 (쉼표로 구분)
+          </label>
+          <input
+            type="text"
+            id="tags"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md"
+            placeholder="예: 보안, 규정준수, 데이터베이스"
+          />
+        </div>
+        <div className="mb-4">
           <label htmlFor="content" className="block text-lg font-semibold mb-2">
             내용
           </label>
-          <textarea
-            id="content"
+          <ReactQuill
+            theme="snow"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md"
-            rows={10}
-            required
+            onChange={setContent}
+            className="bg-white"
           />
         </div>
         {error && <p className="text-red-500 mb-4">{error}</p>}

@@ -7,11 +7,13 @@ interface Question {
   title: string;
   author: string;
   created_at: string;
-  answers_count: number; // Assuming you'll add a count of answers
+  answers_count: number;
+  tags: string[];
 }
 
 const QuestionListPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,7 @@ const QuestionListPage: React.FC = () => {
     const fetchQuestions = async () => {
       const { data, error } = await supabase
         .from('questions')
-        .select('id, title, author, created_at, answers(id)') // Select answers to count them
+        .select('id, title, author, created_at, tags, answers(id)') // Select answers to count them
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -36,6 +38,7 @@ const QuestionListPage: React.FC = () => {
         author: q.author,
         created_at: new Date(q.created_at).toLocaleDateString(),
         answers_count: q.answers ? q.answers.length : 0,
+        tags: q.tags || [],
       }));
 
       setQuestions(formattedQuestions);
@@ -45,9 +48,16 @@ const QuestionListPage: React.FC = () => {
     fetchQuestions();
   }, []);
 
-  const filteredQuestions = questions.filter((question) =>
-    question.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const allTags = [...new Set(questions.flatMap((q) => q.tags))];
+
+  const filteredQuestions = questions
+    .filter((question) => {
+      if (!selectedTag) return true;
+      return question.tags.includes(selectedTag);
+    })
+    .filter((question) =>
+      question.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   if (loading) {
     return <div>로딩 중...</div>;
@@ -73,12 +83,48 @@ const QuestionListPage: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
+      <div className="mb-6">
+        <span className="mr-2 font-semibold">태그:</span>
+        <button
+          onClick={() => setSelectedTag(null)}
+          className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 ${
+            !selectedTag
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700'
+          }`}
+        >
+          전체
+        </button>
+        {allTags.map((tag) => (
+          <button
+            key={tag}
+            onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+            className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 ${
+              tag === selectedTag
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-700'
+            }`}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
       <ul>
         {filteredQuestions.map((question) => (
           <li key={question.id} className="border-b py-4">
             <Link to={`/question/${question.id}`} className="text-lg font-semibold text-blue-600 hover:underline">
               {question.title}
             </Link>
+            <div className="mt-2">
+              {question.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
             <div className="text-sm text-gray-600 mt-1">
               <span>작성자: {question.author}</span>
               <span className="mx-2">|</span>
