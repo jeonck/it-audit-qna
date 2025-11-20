@@ -60,81 +60,159 @@ const QuestionListPage: React.FC = () => {
     );
 
   if (loading) {
-    return <div>로딩 중...</div>;
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex justify-between items-center mb-6">
+          <div className="skeleton h-12 w-64"></div>
+          <div className="skeleton h-10 w-28 rounded-xl"></div>
+        </div>
+        <div className="skeleton h-12 w-full rounded-xl"></div>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="card-elevated p-6">
+            <div className="skeleton h-6 w-3/4 mb-3"></div>
+            <div className="flex gap-2 mb-3">
+              <div className="skeleton h-6 w-16 rounded-full"></div>
+              <div className="skeleton h-6 w-20 rounded-full"></div>
+            </div>
+            <div className="skeleton h-4 w-2/3"></div>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (error) {
-    return <div>오류: {error}</div>;
+    return (
+      <div className="alert-error animate-slide-down">
+        <div className="flex items-start">
+          <span className="text-2xl mr-3">⚠️</span>
+          <div>
+            <h3 className="font-semibold text-lg mb-1">오류가 발생했습니다</h3>
+            <p className="text-danger-700">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-secondary btn-sm mt-3"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl lg:text-4xl font-bold text-neutral-800">정보시스템 감리 Q&A</h1>
-        <Link to="/ask" className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
+    <div className="animate-fade-in">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl lg:text-4xl font-bold text-neutral-800 mb-2">
+            정보시스템 감리 Q&A
+          </h1>
+          <p className="text-neutral-600">궁금한 점을 질문하고 지식을 공유하세요</p>
+        </div>
+        <Link to="/ask" className="btn-primary btn-md whitespace-nowrap">
+          <span className="mr-2">✏️</span>
           질문하기
         </Link>
       </div>
+
       <div className="mb-6">
-        <input
-          type="text"
-          placeholder="질문 검색..."
-          className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="궁금한 내용을 검색해보세요..."
+            className="input pl-12"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-xl">
+            🔍
+          </span>
+        </div>
       </div>
-      <div className="mb-6">
-        <span className="mr-2 font-semibold text-neutral-700">태그:</span>
-        <button
-          onClick={() => setSelectedTag(null)}
-          className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 transition-colors duration-200 ${
-            !selectedTag
-              ? 'bg-primary-500 text-white hover:bg-primary-600'
-              : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
-          }`}
-        >
-          전체
-        </button>
-        {allTags.map((tag) => (
+
+      <div className="mb-8 bg-white rounded-2xl p-6 shadow-soft border border-neutral-100">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-lg">🏷️</span>
+          <span className="font-semibold text-neutral-800">태그 필터</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
           <button
-            key={tag}
-            onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
-            className={`inline-block rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2 transition-colors duration-200 ${
-              tag === selectedTag
-                ? 'bg-primary-500 text-white hover:bg-primary-600'
-                : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300'
-            }`}
+            onClick={() => setSelectedTag(null)}
+            className={!selectedTag ? 'badge-active' : 'badge-neutral'}
           >
-            {tag}
+            전체
           </button>
-        ))}
+          {allTags.map((tag) => (
+            <button
+              key={tag}
+              onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+              className={tag === selectedTag ? 'badge-active' : 'badge-neutral'}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
       </div>
-      <ul>
-        {filteredQuestions.map((question) => (
-          <li key={question.id} className="card-elevated p-4 mb-4">
-            <Link to={`/question/${question.id}`} className="text-lg font-semibold text-primary-600 hover:underline">
-              {question.title}
-            </Link>
-            <div className="mt-2">
-              {question.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-block bg-neutral-200 rounded-full px-2 py-0.5 text-xs font-semibold text-neutral-700 mr-1"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div className="text-sm text-neutral-600 mt-1">
-              <span>작성자: {question.author}</span>
-              <span className="mx-2">|</span>
-              <span>작성일: {question.created_at}</span>
-              <span className="mx-2">|</span>
-              <span>답변: {question.answers_count}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
+
+      {filteredQuestions.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-state-icon">🤔</div>
+          <h3 className="empty-state-title">
+            {searchTerm || selectedTag ? '검색 결과가 없습니다' : '아직 질문이 없습니다'}
+          </h3>
+          <p className="empty-state-description">
+            {searchTerm || selectedTag
+              ? '다른 검색어나 태그로 시도해보세요'
+              : '첫 번째 질문을 등록해보세요!'}
+          </p>
+          <Link to="/ask" className="btn-primary btn-lg">
+            <span className="mr-2">✨</span>
+            질문 등록하기
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="text-sm text-neutral-600 mb-4">
+            <span className="font-semibold text-primary-600">{filteredQuestions.length}개</span>의 질문을 찾았습니다
+          </div>
+          <ul className="space-y-4">
+            {filteredQuestions.map((question, index) => (
+              <li
+                key={question.id}
+                className="card-interactive p-6 animate-slide-up"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <Link to={`/question/${question.id}`}>
+                  <h3 className="text-lg font-semibold text-neutral-800 hover:text-primary-600 transition-colors mb-3">
+                    {question.title}
+                  </h3>
+                </Link>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {question.tags.map((tag) => (
+                    <span key={tag} className="badge-primary">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-600">
+                  <span className="flex items-center gap-1">
+                    <span className="text-base">👤</span>
+                    {question.author}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-base">📅</span>
+                    {question.created_at}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-base">💬</span>
+                    답변 {question.answers_count}개
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

@@ -28,7 +28,7 @@ const newQuestions = [
     answers: [
       {
         author: '신입 감사인',
-        content',
+        content:
           '설계의 적절성과 운영의 효과성 차이군요. 고객에게 설명할 때 Type 2가 더 신뢰도가 높다고 말할 수 있겠네요. 감사합니다!',
       },
     ],
@@ -42,12 +42,12 @@ const newQuestions = [
     answers: [
       {
         author: '개발자',
-        content',
+        content:
           '수동 테스트 예시가 도움이 되었습니다. 저희 애플리케이션에 바로 적용해서 테스트해봐야겠습니다.',
       },
       {
         author: '감사 주니어',
-        content',
+        content:
           '자동화된 도구와 수동 테스트를 병행하는 것이 중요하군요. 두 가지 방법 모두 보고서에 포함해야겠습니다.',
       },
     ],
@@ -62,14 +62,14 @@ const newQuestions = [
   },
   {
     title: '클라우드 환경(AWS)에서 사용자 접근 통제 감사를 위한 핵심 절차는 무엇인가요?',
-    content',
+    content:
       'AWS 환경에서 사용자 접근 통제를 감사할 때 몇 가지 핵심 절차가 있습니다. 첫째, IAM(Identity and Access Management) 정책을 검토하여 "최소 권한의 원칙(Principle of Least Privilege)"이 잘 지켜지고 있는지 확인합니다. 사용자와 그룹에 과도한 권한이 부여되지 않았는지 분석해야 합니다. 둘째, MFA(Multi-Factor Authentication)가 루트 계정 및 모든 IAM 사용자에 대해 활성화되어 있는지 확인합니다. 셋째, CloudTrail 로그를 분석하여 비정상적인 API 호출이나 권한 상승 시도가 있었는지 모니터링합니다. 마지막으로, 정기적으로 IAM Access Analyzer 결과를 검토하여 외부 엔터티와 공유된 리소스가 있는지 확인하고 불필요한 공유를 제거해야 합니다.',
     author: '클라우드 보안 전문가',
     tags: ['클라우드', 'AWS', '접근 통제', '보안 감사'],
     answers: [
       {
         author: '시스템 운영자',
-        content',
+        content:
           'MFA 적용과 CloudTrail 로그 분석이 특히 중요하겠네요. 체크리스트에 추가하겠습니다.'
       }
     ],

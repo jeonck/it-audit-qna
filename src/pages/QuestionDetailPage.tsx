@@ -220,204 +220,298 @@ const QuestionDetailPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div>로딩 중...</div>;
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="skeleton h-16 w-3/4 rounded-xl"></div>
+        <div className="flex gap-2">
+          <div className="skeleton h-8 w-24 rounded-full"></div>
+          <div className="skeleton h-8 w-32 rounded-full"></div>
+        </div>
+        <div className="skeleton h-64 w-full rounded-xl"></div>
+        <div className="skeleton h-48 w-full rounded-xl"></div>
+      </div>
+    );
   }
 
-
   if (error) {
-    return <div>오류: {error}</div>;
+    return (
+      <div className="alert-error animate-slide-down">
+        <div className="flex items-start">
+          <span className="text-2xl mr-3">⚠️</span>
+          <div>
+            <h3 className="font-semibold text-lg mb-1">오류가 발생했습니다</h3>
+            <p className="text-danger-700">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!question) {
-    return <div>질문을 찾을 수 없습니다.</div>;
+    return (
+      <div className="empty-state">
+        <div className="empty-state-icon">❓</div>
+        <h3 className="empty-state-title">질문을 찾을 수 없습니다</h3>
+        <p className="empty-state-description">
+          요청하신 질문이 삭제되었거나 존재하지 않습니다
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className="mb-8">
+    <div className="animate-fade-in">
+      <div className="card-elevated p-8 mb-8">
         {isEditingTitle ? (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
             <input
               type="text"
               value={editedTitle}
               onChange={(e) => setEditedTitle(e.target.value)}
-              className="text-3xl font-bold w-full p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="input text-2xl font-bold flex-1"
             />
-            <button
-              onClick={handleSaveTitle}
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-shrink-0 transition-colors duration-200"
-            >
-              저장
-            </button>
-            <button
-              onClick={handleCancelTitleEdit}
-              className="bg-neutral-500 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg flex-shrink-0 transition-colors duration-200"
-            >
-              취소
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-bold">{question.title}</h1>
+            <div className="flex gap-2">
               <button
-                onClick={handleEditTitleClick}
-                className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-lg text-sm transition-colors duration-200"
+                onClick={handleSaveTitle}
+                className="btn-success btn-md flex-1 sm:flex-initial"
               >
-                수정
+                💾 저장
+              </button>
+              <button
+                onClick={handleCancelTitleEdit}
+                className="btn-secondary btn-md flex-1 sm:flex-initial"
+              >
+                취소
               </button>
             </div>
-            {isEditingTags ? (
-              <div className="flex items-center gap-2 mt-2">
-                <input
-                  type="text"
-                  value={editedTags}
-                  onChange={(e) => setEditedTags(e.target.value)}
-                  className="w-full p-1 border border-neutral-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="태그 (쉼표로 구분)"
-                />
+          </div>
+        ) : (
+          <div className="mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-3 mb-4">
+              <h1 className="text-3xl lg:text-4xl font-bold text-neutral-800 flex-1">
+                {question.title}
+              </h1>
+              <button
+                onClick={handleEditTitleClick}
+                className="btn-primary btn-sm self-start"
+              >
+                ✏️ 제목 수정
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="mb-4">
+          {isEditingTags ? (
+            <div className="flex flex-col sm:flex-row items-stretch gap-2">
+              <input
+                type="text"
+                value={editedTags}
+                onChange={(e) => setEditedTags(e.target.value)}
+                className="input flex-1"
+                placeholder="태그를 쉼표로 구분하여 입력하세요"
+              />
+              <div className="flex gap-2">
                 <button
                   onClick={handleSaveTags}
-                  className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-lg text-xs flex-shrink-0 transition-colors duration-200"
+                  className="btn-success btn-sm flex-1 sm:flex-initial"
                 >
-                  저장
+                  💾 저장
                 </button>
                 <button
                   onClick={handleCancelTagsEdit}
-                  className="bg-neutral-500 hover:bg-neutral-600 text-white px-2 py-1 rounded-lg text-xs flex-shrink-0 transition-colors duration-200"
+                  className="btn-secondary btn-sm flex-1 sm:flex-initial"
                 >
                   취소
                 </button>
               </div>
-            ) : (
-              <div className="flex items-center gap-2 mt-2">
-                {question.tags && question.tags.length > 0 ? (
-                  question.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-block bg-neutral-200 rounded-full px-2 py-0.5 text-xs font-semibold text-neutral-700 mr-1"
-                    >
-                      {tag}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-neutral-500">태그 없음</span>
-                )}
-                <button
-                  onClick={handleEditTagsClick}
-                  className="bg-primary-500 hover:bg-primary-600 text-white px-2 py-0.5 rounded-lg text-xs transition-colors duration-200"
-                >
-                  수정
-                </button>
-              </div>
-            )}
-          </>
-        )}
-        <div className="text-sm text-neutral-600 mt-2">
-          <span>작성자: {question.author}</span>
-          <span className="mx-2">|</span>
-          <span>작성일: {question.created_at}</span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium text-neutral-600">🏷️ 태그:</span>
+              {question.tags && question.tags.length > 0 ? (
+                question.tags.map((tag) => (
+                  <span key={tag} className="badge-primary">
+                    {tag}
+                  </span>
+                ))
+              ) : (
+                <span className="text-sm text-neutral-400 italic">태그 없음</span>
+              )}
+              <button
+                onClick={handleEditTagsClick}
+                className="btn-primary btn-sm ml-2"
+              >
+                ✏️ 수정
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-600 pt-4 border-t border-neutral-200">
+          <span className="flex items-center gap-1">
+            <span className="text-base">👤</span>
+            <span className="font-medium">{question.author}</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="text-base">📅</span>
+            {question.created_at}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="text-base">💬</span>
+            답변 {question.answers.length}개
+          </span>
         </div>
       </div>
-      <div
-        className="prose max-w-none mb-8"
-        dangerouslySetInnerHTML={{ __html: question.content }}
-      />
+
+      <div className="card-elevated p-8 mb-8">
+        <h2 className="text-xl font-bold text-neutral-800 mb-4 flex items-center gap-2">
+          <span className="text-2xl">📖</span>
+          질문 내용
+        </h2>
+        <div
+          className="prose max-w-none"
+          dangerouslySetInnerHTML={{ __html: question.content }}
+        />
+      </div>
       <div>
-        <h2 className="text-2xl font-bold mb-4">답변 ({question.answers.length})</h2>
-        <ul>
-          {question.answers.map((answer) => (
-            <li key={answer.id} className="border-t py-4">
-              <div className="text-sm text-gray-600 mb-2 flex justify-between items-center">
-                <div>
-                  <span>{answer.author}</span>
-                  <span className="mx-2">|</span>
-                  <span>{answer.created_at}</span>
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-2xl font-bold text-neutral-800 flex items-center gap-2">
+            <span className="text-3xl">💬</span>
+            답변
+          </h2>
+          <span className="badge-active">{question.answers.length}개</span>
+        </div>
+
+        {question.answers.length === 0 ? (
+          <div className="card-elevated p-12 text-center mb-8">
+            <div className="text-5xl mb-4 opacity-30">💭</div>
+            <h3 className="text-xl font-semibold text-neutral-700 mb-2">
+              아직 답변이 없습니다
+            </h3>
+            <p className="text-neutral-500">
+              첫 번째 답변을 작성하고 지식을 공유해보세요!
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4 mb-8">
+            {question.answers.map((answer, index) => (
+              <div
+                key={answer.id}
+                className="card-elevated p-6 animate-slide-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-3 mb-4 pb-3 border-b border-neutral-200">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-600">
+                    <span className="flex items-center gap-1">
+                      <span className="text-base">👤</span>
+                      <span className="font-medium">{answer.author}</span>
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-base">📅</span>
+                      {answer.created_at}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    {editingAnswerId === answer.id ? (
+                      <>
+                        <button
+                          onClick={() => handleSaveEdit(answer.id)}
+                          className="btn-success btn-sm"
+                        >
+                          💾 저장
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="btn-secondary btn-sm"
+                        >
+                          취소
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => handleEditClick(answer)}
+                          className="btn-primary btn-sm"
+                        >
+                          ✏️ 수정
+                        </button>
+                        <button
+                          disabled
+                          className="btn-danger btn-sm opacity-50 cursor-not-allowed"
+                          title="삭제 기능은 곧 추가될 예정입니다"
+                        >
+                          🗑️ 삭제
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  {editingAnswerId === answer.id ? (
-                    <>
-                      <button
-                        onClick={() => handleSaveEdit(answer.id)}
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-xs mr-2 transition-colors duration-200"
-                      >
-                        저장
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="bg-neutral-500 hover:bg-neutral-600 text-white px-3 py-1 rounded-lg text-xs transition-colors duration-200"
-                      >
-                        취소
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleEditClick(answer)}
-                        className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-lg text-xs mr-2 transition-colors duration-200"
-                      >
-                        수정
-                      </button>
-                      {/* Delete button will be implemented later */}
-                      <button
-                        // onClick={() => handleDeleteAnswer(answer.id)}
-                        className="bg-accent-500 hover:bg-accent-600 text-white px-3 py-1 rounded-lg text-xs transition-colors duration-200"
-                      >
-                        삭제
-                      </button>
-                    </>
-                  )}
-                </div>
+                {editingAnswerId === answer.id ? (
+                  <div className="rounded-xl overflow-hidden border-2 border-neutral-300 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500 transition-all">
+                    <ReactQuill
+                      theme="snow"
+                      value={editedAnswerContent}
+                      onChange={setEditedAnswerContent}
+                      className="bg-white"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{ __html: answer.content }}
+                  />
+                )}
               </div>
-              {editingAnswerId === answer.id ? (
+            ))}
+          </div>
+        )}
+
+        <div className="card-elevated p-8">
+          <h3 className="text-2xl font-bold text-neutral-800 mb-6 flex items-center gap-2">
+            <span className="text-2xl">✍️</span>
+            답변 작성하기
+          </h3>
+          <form onSubmit={handleAnswerSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="author" className="flex items-center gap-2 text-base font-semibold text-neutral-800 mb-3">
+                <span className="text-lg">👤</span>
+                작성자
+              </label>
+              <input
+                type="text"
+                id="author"
+                value={newAnswerAuthor}
+                onChange={(e) => setNewAnswerAuthor(e.target.value)}
+                className="input"
+                placeholder="이름을 입력해주세요"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="content" className="flex items-center gap-2 text-base font-semibold text-neutral-800 mb-3">
+                <span className="text-lg">📝</span>
+                답변 내용
+              </label>
+              <div className="rounded-xl overflow-hidden border-2 border-neutral-300 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500 transition-all">
                 <ReactQuill
                   theme="snow"
-                  value={editedAnswerContent}
-                  onChange={setEditedAnswerContent}
-                  className="bg-white border border-neutral-300 rounded-lg"
+                  value={newAnswerContent}
+                  onChange={setNewAnswerContent}
+                  className="bg-white"
+                  placeholder="답변을 작성해주세요. 자세한 설명을 포함하면 좋습니다."
                 />
-              ) : (
-                <div
-                  className="prose max-w-none mt-2"
-                  dangerouslySetInnerHTML={{ __html: answer.content }}
-                />
-              )}
-            </li>
-          ))}
-        </ul>
-        <form onSubmit={handleAnswerSubmit} className="mt-8">
-          <h3 className="text-xl font-bold mb-4">답변 등록</h3>
-          <div className="mb-4">
-            <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">
-              작성자
-            </label>
-            <input
-              type="text"
-              id="author"
-              value={newAnswerAuthor}
-              onChange={(e) => setNewAnswerAuthor(e.target.value)}
-              className="w-full p-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="content" className="block text-sm font-medium text-neutral-700 mb-1">
-              내용
-            </label>
-            <ReactQuill
-              theme="snow"
-              value={newAnswerContent}
-              onChange={setNewAnswerContent}
-              className="bg-white border border-neutral-300 rounded-lg"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 mt-4"
-          >
-            답변 등록
-          </button>
-        </form>
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="btn-primary btn-lg w-full sm:w-auto"
+            >
+              <span className="mr-2">✨</span>
+              답변 등록하기
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
