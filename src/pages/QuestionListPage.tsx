@@ -12,18 +12,71 @@ interface Question {
 }
 
 const QuestionListPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // You can make this configurable if needed
+  const [totalQuestions, setTotalQuestions] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [allTags, setAllTags] = useState<string[]>([]);
+
+  // Fetch all unique tags once when component mounts
+  useEffect(() => {
+    const fetchAllTags = async () => {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('tags');
+
+      if (error) {
+        console.error('Error fetching tags:', error.message);
+        return;
+      }
+
+      const allUniqueTags = [...new Set(data.flatMap((q: any) => q.tags || []))];
+      setAllTags(allUniqueTags);
+    };
+
+    fetchAllTags();
+  }, []);
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      const { data, error } = await supabase
+      setLoading(true);
+      setError(null);
+
+      // Fetch questions with filters for display
+      let query = supabase
         .from('questions')
-        .select('id, title, author, created_at, tags, answers(id)') // Select answers to count them
-        .order('created_at', { ascending: false });
+        .select('id, title, author, created_at, tags, answers(id)', { count: 'exact' });
+
+      // Apply search term filter
+      if (searchTerm) {
+        query = query.ilike('title', `%${searchTerm}%`);
+      }
+
+      // Apply tag filter
+      if (selectedTag) {
+        query = query.contains('tags', [selectedTag]);
+      }
+
+      // Fetch total count
+      const { count, error: countError } = await query;
+      if (countError) {
+        setError(countError.message);
+        setLoading(false);
+        return;
+      }
+      setTotalQuestions(count || 0);
+
+      // Fetch paginated data
+      const from = (currentPage - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+
+      const { data, error } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
 
       if (error) {
         setError(error.message);
@@ -46,18 +99,10 @@ const QuestionListPage: React.FC = () => {
     };
 
     fetchQuestions();
-  }, []);
+  }, [currentPage, itemsPerPage, selectedTag, searchTerm]);
 
-  const allTags = [...new Set(questions.flatMap((q) => q.tags))];
-
-  const filteredQuestions = questions
-    .filter((question) => {
-      if (!selectedTag) return true;
-      return question.tags.includes(selectedTag);
-    })
-    .filter((question) =>
-      question.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  // Determine if a search term or tag filter is active
+  const hasSearchOrFilter = searchTerm !== '' || selectedTag !== null;
 
   if (loading) {
     return (
@@ -154,14 +199,14 @@ const QuestionListPage: React.FC = () => {
         </div>
       </div>
 
-      {filteredQuestions.length === 0 ? (
+      {totalQuestions === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">🤔</div>
           <h3 className="empty-state-title">
-            {searchTerm || selectedTag ? '검색 결과가 없습니다' : '아직 질문이 없습니다'}
+            {hasSearchOrFilter ? '검색 결과가 없습니다' : '아직 질문이 없습니다'}
           </h3>
           <p className="empty-state-description">
-            {searchTerm || selectedTag
+            {hasSearchOrFilter
               ? '다른 검색어나 태그로 시도해보세요'
               : '첫 번째 질문을 등록해보세요!'}
           </p>
@@ -173,10 +218,10 @@ const QuestionListPage: React.FC = () => {
       ) : (
         <div className="space-y-4">
           <div className="text-sm text-neutral-600 mb-4">
-            <span className="font-semibold text-primary-600">{filteredQuestions.length}개</span>의 질문을 찾았습니다
+            <span className="font-semibold text-primary-600">{totalQuestions}개</span>의 질문을 찾았습니다
           </div>
           <ul className="space-y-4">
-            {filteredQuestions.map((question, index) => (
+            {questions.map((question, index) => (
               <li
                 key={question.id}
                 className="card-interactive p-6 animate-slide-up"
@@ -211,6 +256,35 @@ const QuestionListPage: React.FC = () => {
               </li>
             ))}
           </ul>
+
+          {/* Pagination Controls */}
+          {totalQuestions > itemsPerPage && (
+            <div className="flex justify-center items-center space-x-2 mt-8">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="btn-secondary"
+              >
+                이전
+              </button>
+              {Array.from({ length: Math.ceil(totalQuestions / itemsPerPage) }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={currentPage === i + 1 ? 'btn-primary' : 'btn-secondary'}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(totalQuestions / itemsPerPage)))}
+                disabled={currentPage === Math.ceil(totalQuestions / itemsPerPage)}
+                className="btn-secondary"
+              >
+                다음
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
