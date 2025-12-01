@@ -20,6 +20,7 @@ const QuestionListPage: React.FC = () => {
   const [itemsPerPage] = useState(10); // You can make this configurable if needed
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [allTags, setAllTags] = useState<string[]>([]);
 
   // Fetch all unique tags once when component mounts
@@ -165,9 +166,16 @@ const QuestionListPage: React.FC = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="궁금한 내용을 검색해보세요..."
+            placeholder="궁금한 내용을 검색해보세요... (엔터를 눌러 검색)"
             className="input pl-12"
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                setSearchTerm(searchInput);
+                setCurrentPage(1);
+              }
+            }}
           />
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 text-xl">
             🔍
